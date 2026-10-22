@@ -6,7 +6,7 @@ The application allows a user to submit customer information through a web form.
 
 ## Architecture
 
-![Architecture Diagram](./Serverless.png)
+![Architecture Diagram](./screenshots/Serverless.png)
 
 **Key architectural principle:** The browser communicates with Lambda, and Lambda communicates with DynamoDB. The frontend never accesses the database directly.
 
