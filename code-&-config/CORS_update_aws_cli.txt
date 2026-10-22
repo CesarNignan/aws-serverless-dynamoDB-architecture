@@ -1,0 +1,8 @@
+aws lambda update-function-url-config \
+  --function-name DynamoDB \
+  --region eu-west-2 \
+  --cors '{"AllowOrigins":["http://<BUCKET_NAME>.s3-website.eu-west-2.amazonaws.com"],"AllowMethods":["POST"],"AllowHeaders":["content-type"],"MaxAge":86400}'
+
+
+  I have used this command because the change wasn't working on the AWS Console
+  It was trying to re-add the automatically generated policy of my URL function which was set to NONE

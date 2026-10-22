@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New Customer Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070d;
+    --card: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.12);
+    --text: #f4f4f8;
+    --muted: #9a9ab0;
+    --accent-1: #7c5cff;
+    --accent-2: #00d4ff;
+    --ok: #3ddc97;
+    --err: #ff5c7a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* animated background blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    z-index: 0;
+    animation: float 14s ease-in-out infinite alternate;
+  }
+  .blob.one { width: 420px; height: 420px; background: var(--accent-1); top: -120px; left: -100px; }
+  .blob.two { width: 380px; height: 380px; background: var(--accent-2); bottom: -120px; right: -80px; animation-delay: -6s; }
+  .blob.three { width: 260px; height: 260px; background: #ff4ecd; top: 55%; left: 55%; opacity: 0.3; animation-delay: -3s; }
+
+  @keyframes float {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(60px, 40px) scale(1.15); }
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 460px;
+    padding: 40px 36px 36px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: rise 0.7s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 18px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-radius: 999px;
+  }
+
+  h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 34px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    background: linear-gradient(120deg, #fff 20%, var(--accent-2) 60%, var(--accent-1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 30px; }
+
+  form { display: grid; gap: 18px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* floating label fields */
+  .field { position: relative; }
+
+  .field input {
+    width: 100%;
+    padding: 24px 16px 10px;
+    font: inherit;
+    font-size: 16px;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    outline: none;
+    transition: border-color .25s, box-shadow .25s, background .25s;
+  }
+
+  .field label {
+    position: absolute;
+    left: 16px;
+    top: 17px;
+    font-size: 15px;
+    color: var(--muted);
+    pointer-events: none;
+    transition: all .2s ease;
+  }
+
+  .field input:focus,
+  .field input:not(:placeholder-shown) { background: rgba(255, 255, 255, 0.08); }
+
+  .field input:focus {
+    border-color: var(--accent-1);
+    box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.22);
+  }
+
+  .field input:focus + label,
+  .field input:not(:placeholder-shown) + label {
+    top: 8px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+  }
+
+  /* hide number spinners */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  button {
+    position: relative;
+    margin-top: 6px;
+    padding: 16px;
+    font: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    background: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+    background-size: 160% 100%;
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(124, 92, 255, 0.4);
+    transition: transform .2s, box-shadow .2s, background-position .4s;
+  }
+
+  button:hover { transform: translateY(-2px); background-position: 100% 0; box-shadow: 0 16px 38px rgba(0, 212, 255, 0.35); }
+  button:active { transform: translateY(0) scale(0.98); }
+  button:disabled { opacity: 0.7; cursor: wait; transform: none; }
+
+  .spinner {
+    display: none;
+    width: 18px; height: 18px;
+    margin: 0 auto;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  button.loading .label { display: none; }
+  button.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status {
+    display: none;
+    margin-top: 4px;
+    padding: 14px 16px;
+    font-size: 14px;
+    border-radius: 12px;
+    animation: rise .4s both;
+  }
+  .status.ok  { display: block; color: var(--ok);  background: rgba(61, 220, 151, 0.1); border: 1px solid rgba(61, 220, 151, 0.3); }
+  .status.err { display: block; color: var(--err); background: rgba(255, 92, 122, 0.1); border: 1px solid rgba(255, 92, 122, 0.3); }
+
+  @media (max-width: 480px) {
+    .card { padding: 32px 22px 28px; }
+    .row { grid-template-columns: 1fr; }
+    h1 { font-size: 28px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="blob one"></div>
+  <div class="blob two"></div>
+  <div class="blob three"></div>
+
+  <main class="card">
+    <span class="badge">Order Desk</span>
+    <h1>New customer order</h1>
+    <p class="sub">Fill it in, hit save, and it lands in DynamoDB.</p>
+
+    <form id="orderForm" novalidate>
+      <div class="row">
+        <div class="field">
+          <input id="CustomerID" name="CustomerID" type="number" min="1" step="1" placeholder=" " required>
+          <label for="CustomerID">Customer ID</label>
+        </div>
+        <div class="field">
+          <input id="OrderID" name="OrderID" type="number" min="1" step="1" placeholder=" " required>
+          <label for="OrderID">Order ID</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <input id="Name" name="Name" type="text" autocomplete="name" placeholder=" " required>
+        <label for="Name">Full name</label>
+      </div>
+
+      <div class="field">
+        <input id="Email" name="Email" type="email" autocomplete="email" placeholder=" " required>
+        <label for="Email">Email address</label>
+      </div>
+
+      <button type="submit" id="submitBtn">
+        <span class="label">Save order</span>
+        <span class="spinner"></span>
+      </button>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+
+<script>
+  const ENDPOINT = "https://ssoz2ci6kaw4vtm5mgvnquctg40warxd.lambda-url.eu-west-2.on.aws/";
+
+  const form = document.getElementById("orderForm");
+  const btn = document.getElementById("submitBtn");
+  const statusBox = document.getElementById("status");
+
+  function show(type, msg) {
+    statusBox.className = "status " + type;
+    statusBox.textContent = msg;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    statusBox.className = "status";
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const data = Object.fromEntries(new FormData(form));
+    data.CustomerID = parseInt(data.CustomerID, 10);
+    data.OrderID = parseInt(data.OrderID, 10);
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const out = await res.json().catch(() => ({}));
+
+      if (res.ok) {
+        show("ok", `Saved! Order ${data.OrderID} for ${data.Name} is in the table.`);
+        form.reset();
+      } else {
+        show("err", out.message || `Request failed (${res.status}).`);
+      }
+    } catch (err) {
+      show("err", "Couldn't reach the server. Check your CORS settings and the Function URL.");
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove("loading");
+    }
+  });
+</script>
+</body>
+</html>
